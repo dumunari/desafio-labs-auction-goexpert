@@ -1,0 +1,65 @@
+@baseUrl = http://localhost:8080
+
+### 1) Criar usuario
+POST {{baseUrl}}/user
+Content-Type: application/json
+
+{
+  "name": "Usuario de teste"
+}
+
+### 2) Criar leilao
+POST {{baseUrl}}/auction
+Content-Type: application/json
+
+{
+  "product_name": "MacBook Pro M3",
+  "category": "electronics",
+  "description": "Notebook em excelente estado, bateria ok e sem marcas relevantes.",
+  "condition": 1
+}
+
+### 3) Buscar leilao criado (preencher <AUCTION_ID>)
+GET {{baseUrl}}/auction/<AUCTION_ID>
+
+### 4) Buscar usuario criado (preencher <USER_ID>)
+GET {{baseUrl}}/user/<USER_ID>
+
+### 5) Criar lance
+POST {{baseUrl}}/bid
+Content-Type: application/json
+
+{
+  "user_id": "<USER_ID>",
+  "auction_id": "<AUCTION_ID>",
+  "amount": 1500.50
+}
+
+### 6) Criar segundo lance
+POST {{baseUrl}}/bid
+Content-Type: application/json
+
+{
+  "user_id": "<USER_ID>",
+  "auction_id": "<AUCTION_ID>",
+  "amount": 1800.75
+}
+
+### 7) Listar lances do leilao
+GET {{baseUrl}}/bid/<AUCTION_ID>
+
+### 8) Validar vencedor
+GET {{baseUrl}}/auction/winner/<AUCTION_ID>
+
+### 9) Aguardar AUCTION_DURATION e verificar fechamento (status Closed)
+GET {{baseUrl}}/auction/<AUCTION_ID>
+
+### 10) Tentar lance apos expiracao (nao deve aceitar)
+POST {{baseUrl}}/bid
+Content-Type: application/json
+
+{
+  "user_id": "<USER_ID>",
+  "auction_id": "<AUCTION_ID>",
+  "amount": 2100.00
+}
