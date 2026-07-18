@@ -55,7 +55,7 @@ var bidBatch []bid_entity.Bid
 type BidUseCaseInterface interface {
 	CreateBid(
 		ctx context.Context,
-		bidInputDTO BidInputDTO) *internal_error.InternalError
+		bidInputDTO BidInputDTO) (*BidOutputDTO, *internal_error.InternalError)
 
 	FindWinningBidByAuctionId(
 		ctx context.Context, auctionId string) (*BidOutputDTO, *internal_error.InternalError)
@@ -103,16 +103,24 @@ func (bu *BidUseCase) triggerCreateRoutine(ctx context.Context) {
 
 func (bu *BidUseCase) CreateBid(
 	ctx context.Context,
-	bidInputDTO BidInputDTO) *internal_error.InternalError {
+	bidInputDTO BidInputDTO) (*BidOutputDTO, *internal_error.InternalError) {
 
 	bidEntity, err := bid_entity.CreateBid(bidInputDTO.UserId, bidInputDTO.AuctionId, bidInputDTO.Amount)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	bu.bidChannel <- *bidEntity
+	if err := bu.BidRepository.CreateBid(ctx, []bid_entity.Bid{*bidEntity}); err != nil {
+		return nil, err
+	}
 
-	return nil
+	return &BidOutputDTO{
+		Id:        bidEntity.Id,
+		UserId:    bidEntity.UserId,
+		AuctionId: bidEntity.AuctionId,
+		Amount:    bidEntity.Amount,
+		Timestamp: bidEntity.Timestamp,
+	}, nil
 }
 
 func getMaxBatchSizeInterval() time.Duration {

@@ -5,8 +5,9 @@ import (
 	"fullcycle-auction_go/configuration/rest_err"
 	"fullcycle-auction_go/internal/infra/api/web/validation"
 	"fullcycle-auction_go/internal/usecase/bid_usecase"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type BidController struct {
@@ -29,7 +30,7 @@ func (u *BidController) CreateBid(c *gin.Context) {
 		return
 	}
 
-	err := u.bidUseCase.CreateBid(context.Background(), bidInputDTO)
+	bidOutput, err := u.bidUseCase.CreateBid(context.Background(), bidInputDTO)
 	if err != nil {
 		restErr := rest_err.ConvertError(err)
 
@@ -37,5 +38,5 @@ func (u *BidController) CreateBid(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusCreated)
+	c.JSON(http.StatusCreated, bidOutput)
 }
